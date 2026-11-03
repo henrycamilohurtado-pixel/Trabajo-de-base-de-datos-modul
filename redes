@@ -1,0 +1,114 @@
+import java.util.*;
+
+public class Main {
+
+    static Map<String, List<String>> redSocial = new LinkedHashMap<>();
+
+    public static void agregarPersona(String nombre) {
+        redSocial.putIfAbsent(nombre, new ArrayList<>());
+    }
+
+    public static void agregarAmistad(String persona1, String persona2) {
+        redSocial.get(persona1).add(persona2);
+        redSocial.get(persona2).add(persona1);
+    }
+
+    public static void buscarRuta(String origen, String destino) {
+
+        System.out.println("\n==================================");
+        System.out.println("Ruta de " + origen + " a " + destino);
+        System.out.println("==================================");
+
+        if (!redSocial.containsKey(origen) ||
+            !redSocial.containsKey(destino)) {
+            System.out.println("Una de las personas no existe.");
+            return;
+        }
+
+        Queue<String> cola = new LinkedList<>();
+        Set<String> visitados = new HashSet<>();
+        Map<String, String> padre = new HashMap<>();
+        Map<String, Integer> nivel = new HashMap<>();
+
+        cola.add(origen);
+        visitados.add(origen);
+        nivel.put(origen, 0);
+
+        while (!cola.isEmpty()) {
+            String actual = cola.poll();
+
+            if (actual.equals(destino)) {
+                break;
+            }
+
+            for (String amigo : redSocial.get(actual)) {
+                if (!visitados.contains(amigo)) {
+                    visitados.add(amigo);
+                    padre.put(amigo, actual);
+                    nivel.put(amigo, nivel.get(actual) + 1);
+                    cola.add(amigo);
+                }
+            }
+        }
+
+        if (!visitados.contains(destino)) {
+            System.out.println("No existe una ruta entre estas personas.");
+            return;
+        }
+
+        List<String> ruta = new ArrayList<>();
+        String actual = destino;
+
+        while (actual != null) {
+            ruta.add(actual);
+            actual = padre.get(actual);
+        }
+
+        Collections.reverse(ruta);
+
+        System.out.println("Ruta más corta:");
+        System.out.println(String.join(" -> ", ruta));
+        System.out.println("Personas en la ruta: " + ruta.size());
+        System.out.println("Conexiones: " + nivel.get(destino));
+    }
+
+    public static void mostrarRedSocial() {
+        System.out.println("==================================");
+        System.out.println("       RED SOCIAL DE AMIGOS");
+        System.out.println("==================================");
+
+        for (String persona : redSocial.keySet()) {
+            System.out.println(persona + " -> " + redSocial.get(persona));
+        }
+    }
+
+    public static void main(String[] args) {
+
+        agregarPersona("Ana");
+        agregarPersona("Carlos");
+        agregarPersona("Laura");
+        agregarPersona("Maria");
+        agregarPersona("Pedro");
+        agregarPersona("Juan");
+        agregarPersona("Sofia");
+        agregarPersona("Andres");
+
+        agregarAmistad("Ana", "Carlos");
+        agregarAmistad("Ana", "Laura");
+        agregarAmistad("Carlos", "Juan");
+        agregarAmistad("Carlos", "Maria");
+        agregarAmistad("Laura", "Pedro");
+        agregarAmistad("Maria", "Sofia");
+        agregarAmistad("Pedro", "Juan");
+        agregarAmistad("Juan", "Andres");
+        agregarAmistad("Sofia", "Andres");
+
+        mostrarRedSocial();
+
+        buscarRuta("Ana", "Andres");
+        buscarRuta("Ana", "Sofia");
+        buscarRuta("Carlos", "Pedro");
+        buscarRuta("Laura", "Andres");
+        buscarRuta("Ana", "Ana");
+    }
+}
