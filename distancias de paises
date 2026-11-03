@@ -1,0 +1,139 @@
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Arista {
+    private String origen;
+    private String destino;
+    private double distanciaKm;
+    private boolean dirigida;
+
+    public Arista(String origen, String destino,
+                  double distanciaKm, boolean dirigida) {
+        this.origen = origen;
+        this.destino = destino;
+        this.distanciaKm = distanciaKm;
+        this.dirigida = dirigida;
+    }
+
+    @Override
+    public String toString() {
+        String flecha = dirigida ? " -> " : " -- ";
+        return origen + flecha + destino
+                + " [Distancia: " + distanciaKm + " km]";
+    }
+}
+
+class Vertice {
+    private String nombre;
+    private List<String> conexiones;
+
+    public Vertice(String nombre) {
+        this.nombre = nombre;
+        this.conexiones = new ArrayList<>();
+    }
+
+    public void agregarConexion(String destino) {
+        if (!conexiones.contains(destino)) {
+            conexiones.add(destino);
+        }
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " -> Conectada con: " + conexiones;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        List<Vertice> ciudades = new ArrayList<>();
+        List<Arista> conexiones = new ArrayList<>();
+
+        // 1. Crear las 10 ciudades del Peru
+        String[] nombres = {
+            "Lima", "Cusco", "Arequipa", "Trujillo",
+            "Piura", "Chiclayo", "Ica", "Puno",
+            "Tacna", "Iquitos"
+        };
+
+        for (String nombre : nombres) {
+            ciudades.add(new Vertice(nombre));
+        }
+
+        // 2. Registrar las 15 conexiones
+        conexiones.add(new Arista("Lima", "Ica", 300, true));
+        conexiones.add(new Arista("Lima", "Trujillo", 560, true));
+        conexiones.add(new Arista("Lima", "Arequipa", 765, true));
+        conexiones.add(new Arista("Lima", "Cusco", 1100, true));
+        conexiones.add(new Arista("Trujillo", "Chiclayo", 210, true));
+        conexiones.add(new Arista("Chiclayo", "Piura", 215, true));
+        conexiones.add(new Arista("Piura", "Iquitos", 850, true));
+        conexiones.add(new Arista("Arequipa", "Puno", 290, true));
+        conexiones.add(new Arista("Puno", "Cusco", 390, true));
+        conexiones.add(new Arista("Arequipa", "Tacna", 370, true));
+        conexiones.add(new Arista("Ica", "Arequipa", 710, true));
+        conexiones.add(new Arista("Cusco", "Iquitos", 850, true));
+        conexiones.add(new Arista("Lima", "Chiclayo", 770, true));
+        conexiones.add(new Arista("Trujillo", "Piura", 420, true));
+        conexiones.add(new Arista("Tacna", "Puno", 410, true));
+
+        // 3. Construir las listas de adyacencia
+        for (Arista arista : conexiones) {
+            String origen = arista.toString().split(" -> ")[0];
+
+            for (Vertice ciudad : ciudades) {
+                if (ciudad.getNombre().equals(origen)) {
+                    String destino = arista.toString()
+                            .split(" -> ")[1]
+                            .split(" \\[")[0];
+                    ciudad.agregarConexion(destino);
+                }
+            }
+        }
+
+        // 4. Calcular la densidad del grafo
+        int n = ciudades.size();
+        int a = conexiones.size();
+
+        double densidad = (double) a / (n * (n - 1));
+
+        // 5. Mostrar resultados
+        System.out.println("==========================================");
+        System.out.println(" RED DE CIUDADES DEL PERU");
+        System.out.println("==========================================");
+
+        System.out.println("Total de ciudades: " + n);
+        System.out.println("Total de conexiones: " + a);
+
+        System.out.printf("Densidad del grafo: %.4f%n", densidad);
+
+        if (densidad >= 0.5) {
+            System.out.println("Clasificacion: GRAFO DENSO");
+        } else {
+            System.out.println("Clasificacion: GRAFO DISPERSO");
+        }
+
+        System.out.println("\n==========================================");
+        System.out.println(" LISTADO DE CONEXIONES");
+        System.out.println("==========================================");
+
+        for (Arista arista : conexiones) {
+            System.out.println(arista);
+        }
+
+        System.out.println("\n==========================================");
+        System.out.println(" CONEXIONES POR CIUDAD");
+        System.out.println("==========================================");
+
+        for (Vertice ciudad : ciudades) {
+            System.out.println(ciudad);
+        }
+    }
+}
